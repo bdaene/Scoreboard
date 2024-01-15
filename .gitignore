@@ -4,4 +4,6 @@ build/
 *.egg-info/
 dist/
 
-*/sqlite3
+.coverage
+*.db
+*.sqlite3

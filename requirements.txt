@@ -1,4 +1,6 @@
 attrs
 nicegui
+pytest
+pytest-cov
 pyyaml
 tortoise-orm

@@ -1,5 +1,12 @@
+import logging
+
+from scoreboard import config
+
+
 def main():
-    # TODO load config
+    logging.basicConfig(level=logging.INFO)
+    if config.DEFAULT_PATH.exists():
+        config.load()
     # TODO init Database
     # TODO launch GUI
     ...
