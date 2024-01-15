@@ -1,0 +1,4 @@
+attrs
+nicegui
+pyyaml
+tortoise-orm
