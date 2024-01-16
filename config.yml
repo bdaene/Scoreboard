@@ -1,0 +1,4 @@
+database:
+  url: sqlite://scoreboard.db
+score:
+  order: ['-tournament_points', '-victory_points', '-spice', '-solaris', '-water', '-troops']

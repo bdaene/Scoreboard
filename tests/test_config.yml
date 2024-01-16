@@ -1,2 +1,4 @@
 database:
   url: "sqlite://:memory:"
+score:
+  order: ['-tournament_points', 'victory_points']

@@ -1,16 +1,21 @@
 import logging
 
-from scoreboard import config
+import tortoise
+
+from scoreboard import config, database
 
 
-def main():
+async def main():
     logging.basicConfig(level=logging.INFO)
+
     if config.DEFAULT_PATH.exists():
         config.load()
-    # TODO init Database
+
+    await database.init()
+
     # TODO launch GUI
     ...
 
 
 if __name__ == "__main__":
-    main()
+    tortoise.run_async(main())

@@ -22,9 +22,14 @@ class DatabaseConfig:
 
 
 @define
+class ScoreConfig:
+    order: tuple[str] = field(default=('-tournament_points',), converter=tuple)
+
+
+@define
 class Config:
-    database: DatabaseConfig = field(factory=dict,
-                                     converter=_get_converter(DatabaseConfig))
+    database: DatabaseConfig = field(factory=dict, converter=_get_converter(DatabaseConfig))
+    score: ScoreConfig = field(factory=dict, converter=_get_converter(ScoreConfig))
 
 
 _config: Config = Config()
