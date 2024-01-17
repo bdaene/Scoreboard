@@ -1,4 +1,6 @@
 database:
-  url: sqlite://scoreboard.db
+  url: sqlite://scoreboard_2.db
 score:
   order: ['-tournament_points', '-victory_points', '-spice', '-solaris', '-water', '-troops']
+gui:
+  dark: True

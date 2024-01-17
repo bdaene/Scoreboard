@@ -1,21 +1,21 @@
+import asyncio
 import logging
 
-import tortoise
-
-from scoreboard import config, database
+from scoreboard import config, database, gui
 
 
-async def main():
+def main():
     logging.basicConfig(level=logging.INFO)
 
     if config.DEFAULT_PATH.exists():
         config.load()
 
-    await database.init()
+    try:
+        asyncio.run(database.init())
+        gui.start()
+    finally:
+        asyncio.run(database.close())
 
-    # TODO launch GUI
-    ...
 
-
-if __name__ == "__main__":
-    tortoise.run_async(main())
+if __name__ in {"__main__", "__mp_main__"}:
+    main()

@@ -27,9 +27,17 @@ class ScoreConfig:
 
 
 @define
+class GuiConfig:
+    favicon: Path = field(default='./dune.ico', converter=Path)
+    title: str = field(default='Score Board')
+    dark: bool = field(default=False)
+
+
+@define
 class Config:
     database: DatabaseConfig = field(factory=dict, converter=_get_converter(DatabaseConfig))
     score: ScoreConfig = field(factory=dict, converter=_get_converter(ScoreConfig))
+    gui: GuiConfig = field(factory=dict, converter=_get_converter(GuiConfig))
 
 
 _config: Config = Config()
@@ -52,5 +60,5 @@ def save(url: Path = DEFAULT_PATH):
         yaml.safe_dump(asdict(_config), config_file)
 
 
-def config():
+def config() -> Config:
     return _config

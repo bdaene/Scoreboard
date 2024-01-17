@@ -1,0 +1,1 @@
+from scoreboard.gui.scoreboard import start
