@@ -1,35 +1,50 @@
 from attr import asdict
 from nicegui import ui
 
+from scoreboard import models
 from scoreboard.config import config
-from scoreboard.gui import players, rounds, summary
+from scoreboard.gui import players, rounds, summary, tournament
 
 
 def style():
-    ui.button.default_props('round')
+    ui.button.default_props('round flat')
     ui.input.default_props('dense')
+    ui.tabs.default_props('dense')
 
 
 def build():
     style()
 
-    dark_mode = ui.dark_mode(value=config().gui.dark).props('align-right')
-    with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as players_panel:
-        players.build()
-        ui.button(icon='menu_open', on_click=players_panel.hide).classes('mu-auto ml-auto').props('flat')
+    @ui.page('/')
+    def index_page():
+        ui.open('/tournaments')
 
-    with ui.header():
-        ui.button(icon='person', on_click=players_panel.toggle)
-        ui.label("Tournament").classes('font-bold ml-auto self-center text-2xl')
-        ui.button(icon='dark_mode', on_click=dark_mode.toggle).classes('ml-auto')
+    ui.page('/tournaments')(tournament.build)
 
-    with ui.row(wrap=False).classes('w-full h-screen'):
-        rounds.build()
-        summary.build()
+    @ui.page('/tournaments/{tournament_name}')
+    async def page(tournament_name: str):
+        current_tournament = await models.Tournament.filter(name=tournament_name).first()
+        if current_tournament is None:
+            ui.open(f'/tournaments?unknown_tournament={tournament_name}')
+            return
+
+        dark_mode = ui.dark_mode(value=config().gui.dark).props('align-right')
+        with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as players_panel:
+            await players.build(current_tournament)
+
+        with ui.header():
+            ui.button(icon='person', on_click=players_panel.toggle, color='white').classes(remove='bg-white')
+            ui.button(icon='emoji_events', on_click=index_page, color='white').classes(remove='bg-white')
+            ui.label().bind_text_from(current_tournament, 'name').classes('font-bold ml-auto self-center text-2xl')
+            ui.button(icon='dark_mode', on_click=dark_mode.toggle, color='white').classes('ml-auto', remove='bg-white')
+
+        with ui.row(wrap=False).classes('w-full h-full'):
+            await rounds.build(current_tournament)
+            await summary.build(current_tournament)
 
 
 def start():
     style()
     build()
-    # app.on_connect(actions['show_tournament_dialog'])
-    ui.run(**asdict(config().gui))
+
+    ui.run(reload=False, **asdict(config().gui))
