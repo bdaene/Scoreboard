@@ -1,9 +1,10 @@
 from nicegui import ui
 
 from scoreboard import models
+from scoreboard.gui.utils import Events
 
 
-async def build(current_tournament: models.Tournament):
+async def build(current_tournament: models.Tournament, events: Events):
     columns = [
         dict(name='name', label='Player Name', field='name', align='left'),
         dict(name='round_1', label='Round 1', field='round_1'),

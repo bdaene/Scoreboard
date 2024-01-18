@@ -1,9 +1,10 @@
 from nicegui import ui
 
 from scoreboard import models
+from scoreboard.gui.utils import Events
 
 
-async def build(current_tournament: models.Tournament):
+async def build(current_tournament: models.Tournament, events: Events):
     async def build_round(round: models.Round):
         round_name = f'round_{round.number}'
         with tabs:

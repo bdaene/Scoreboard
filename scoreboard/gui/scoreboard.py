@@ -4,6 +4,7 @@ from nicegui import ui
 from scoreboard import models
 from scoreboard.config import config
 from scoreboard.gui import players, rounds, summary, tournament
+from scoreboard.gui.utils import Events
 
 
 def style():
@@ -28,9 +29,10 @@ def build():
             ui.open(f'/tournaments?unknown_tournament={tournament_name}')
             return
 
+        events = Events()
         dark_mode = ui.dark_mode(value=config().gui.dark).props('align-right')
         with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as players_panel:
-            await players.build(current_tournament)
+            await players.build(current_tournament, events)
 
         with ui.header():
             ui.button(icon='person', on_click=players_panel.toggle, color='white').classes(remove='bg-white')
@@ -39,8 +41,8 @@ def build():
             ui.button(icon='dark_mode', on_click=dark_mode.toggle, color='white').classes('ml-auto', remove='bg-white')
 
         with ui.row(wrap=False).classes('w-full h-full'):
-            await rounds.build(current_tournament)
-            await summary.build(current_tournament)
+            await rounds.build(current_tournament, events)
+            await summary.build(current_tournament, events)
 
 
 def start():
