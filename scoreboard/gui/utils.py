@@ -1,3 +1,5 @@
+from bisect import insort
+
 from nicegui import ui
 
 
@@ -22,3 +24,10 @@ class Events:
         self.player_modified = Event('Player {player.name} modified.')
         self.round_created = Event('Round {round.number} created.')
         self.score_updated = Event('Score of player {score.player.name} for round {score.round.number} updated.')
+
+
+def sort_in_parent(element, lo=1):
+    slot = element.parent_slot
+    slot.children.remove(element)
+    insort(slot.children, element, lo=lo, key=lambda e: e.player.name)
+    slot.parent.update()
