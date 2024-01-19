@@ -9,7 +9,7 @@ tournament_selected = Event('tournament_selected')
 async def build(unknown_tournament: str = ''):
     with ui.dialog(value=True).props('persistent'), ui.card():
         if unknown_tournament:
-            ui.notify(f"Tournament {unknown_tournament} not found", color='negative')
+            ui.notify(f"Tournament {unknown_tournament} not found", type='negative')
 
         tournaments: list[models.Tournament] = await models.Tournament.all()
         options = sorted(tournament.name for tournament in tournaments)

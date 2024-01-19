@@ -32,7 +32,7 @@ async def run():
 
     assert await round_1.tables.all() == tables
     assert await tables[0].seats.all() == seats[:4]
-    assert (await Seat.filter(player=players[5]).first()).number == 2
+    assert (await Seat.get(player=players[5])).number == 2
 
     scores = await asyncio.gather(
         Score.create(round=round_1, player=players[0], tournament_points=3, victory_points=10),
@@ -51,9 +51,3 @@ async def run():
 
 def test_run():
     run_async(run())
-
-
-def test_score_order():
-    from scoreboard.models.score import ORDER
-
-    assert ORDER == ((True, 'tournament_points'), (False, 'victory_points'))

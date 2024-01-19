@@ -21,6 +21,15 @@ async def build(current_tournament: models.Tournament, events: Events):
         async def toggle_full_screen():
             table.toggle_fullscreen()
             button.props('icon=fullscreen_exit' if table.is_fullscreen else 'icon=fullscreen')
+
         button = ui.button(icon='fullscreen', on_click=toggle_full_screen).props('flat')
 
-
+        # def update_player_row(player: models.player, disabled: bool):
+        #     for element in players_row.get(player.pk, []):
+        #         if disabled:
+        #             element.classes('disabled')
+        #         else:
+        #             element.classes(remove='disabled')
+        #
+        # events.player_added.register(partial(update_player_row, disabled=False))
+        # events.player_removed.register(partial(update_player_row, disabled=True))

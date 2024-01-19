@@ -1,6 +1,25 @@
+tournament:
+  table_size: 4
+  score:
+    - name: 'tournament_points'
+      descending: True
+      label : 'TP'
+    - name: 'victory_points'
+      descending: True
+      label : 'VP'
+    - name: 'spice'
+      descending: True
+      label : 'Spice'
+    - name: 'solaris'
+      descending: True
+      label : 'Solaris'
+    - name: 'water'
+      descending: True
+      label : 'Water'
+    - name: 'troops'
+      descending: True
+      label : 'Troops'
 database:
   url: sqlite://scoreboard.db
-score:
-  order: ['-tournament_points', '-victory_points', '-spice', '-solaris', '-water', '-troops']
 gui:
   dark: True

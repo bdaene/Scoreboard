@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from scoreboard import config, database, gui
+from scoreboard import config
 
 
 def main():
@@ -11,6 +11,7 @@ def main():
         config.load()
 
     try:
+        from scoreboard import database, gui  # Config must be loaded before the module models.Score
         asyncio.run(database.init())
         gui.start()
     finally:

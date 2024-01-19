@@ -24,12 +24,13 @@ def build():
 
     @ui.page('/tournaments/{tournament_name}')
     async def page(tournament_name: str):
-        current_tournament = await models.Tournament.filter(name=tournament_name).first()
+        current_tournament = await models.Tournament.get_or_none(name=tournament_name)
         if current_tournament is None:
             ui.open(f'/tournaments?unknown_tournament={tournament_name}')
             return
 
         events = Events()
+        ui.page_title(f'Score Board - {current_tournament.name}')
         dark_mode = ui.dark_mode(value=config().gui.dark).props('align-right')
         with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as players_panel:
             await players.build(current_tournament, events)

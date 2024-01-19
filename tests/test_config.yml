@@ -1,4 +1,10 @@
 database:
   url: "sqlite://:memory:"
-score:
-  order: ['-tournament_points', 'victory_points']
+tournament:
+  score:
+    - name: 'tournament_points'
+      descending: True
+      label : 'TP'
+    - name: 'victory_points'
+      descending: False
+      label : 'VP'
