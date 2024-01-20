@@ -7,4 +7,6 @@ dist/
 .coverage
 .pytest_cache/
 *.db
+*.db-*
 *.sqlite3
+*.sqlite3-*

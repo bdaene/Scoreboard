@@ -1,4 +1,5 @@
 import logging
+from importlib import resources
 from pathlib import Path
 
 import yaml
@@ -18,7 +19,7 @@ def _get_converter(config_class):
 
 @define
 class DatabaseConfig:
-    url: str = field(default='sqlite://scoreboard.db')
+    url: str = field(default='sqlite://data/scoreboard.db')
 
 
 @define
@@ -39,7 +40,7 @@ class TournamentConfig:
 
 @define
 class GuiConfig:
-    favicon: Path = field(default='./dune.ico', converter=Path)
+    favicon: Path = field(default=resources.files('scoreboard') / 'emoji_events.ico', converter=Path)
     title: str = field(default='Score Board')
     dark: bool = field(default=False)
 
@@ -52,7 +53,7 @@ class Config:
 
 
 _config: Config = Config()
-DEFAULT_PATH = Path('config.yml')
+DEFAULT_PATH = Path('data/config.yml')
 
 
 def load(url: Path = DEFAULT_PATH) -> Config:
