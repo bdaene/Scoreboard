@@ -1,4 +1,5 @@
 from bisect import insort
+from typing import Iterable
 
 from nicegui import ui
 
@@ -31,3 +32,7 @@ def sort_in_parent(element, lo=1):
     slot.children.remove(element)
     insort(slot.children, element, lo=lo, key=lambda e: e.player.name)
     slot.parent.update()
+
+
+def tuples_sum(tuples: Iterable[tuple]):
+    return tuple(map(sum, zip(*tuples)))

@@ -17,7 +17,7 @@ async def build(current_tournament: models.Tournament, events: Events):
     score_config = config().tournament.score
 
     async def build_player_row(round: models.round, seat: models.Seat):
-        player = await seat.player
+        player = await seat.player.get()
         score = await models.Score.get_or_none(round=round, player=player)
 
         ui.label(seat.number)
@@ -65,11 +65,9 @@ async def build(current_tournament: models.Tournament, events: Events):
         done_button.on('click', toggle_score)
 
     async def build_round_grid(round: models.Round):
-        await current_tournament.fetch_related('players')
-
         with (ui.grid(columns=3 + len(score_config))
-                      .classes('w-full items-align content-start items-center gap-y-0')
-                      .style(f'grid-template-columns: auto 1fr repeat({1 + len(score_config)}, 0.2fr)')):
+                .classes('w-full items-align content-start items-center gap-y-0')
+                .style(f'grid-template-columns: auto 1fr repeat({1 + len(score_config)}, 0.2fr)')) as grid:
             async for table in round.tables.all().order_by('number'):
                 ui.label(f"Table {table.number}").classes('font-bold col-span-2 mr-auto')
                 for field in score_config:

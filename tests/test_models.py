@@ -44,7 +44,7 @@ async def run():
         Score.create(round=round_1, player=players[6], tournament_points=5, victory_points=14),
     )
 
-    assert await Score.all() == sorted(scores)
+    assert await Score.all() == sorted(scores, key=Score.get_sort_key)
 
     await database.close()
 

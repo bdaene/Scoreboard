@@ -16,13 +16,6 @@ class Score(models.Model):
         ordering = [('-' if score_field.descending else '') + score_field.name
                     for score_field in config().tournament.score]
 
-    def __lt__(self, other: 'Score') -> bool:
-        for score_field in config().tournament.score:
-            my_value, other_value = getattr(self, score_field.name), getattr(other, score_field.name)
-            if my_value == other_value:
-                continue
-            if score_field.descending:
-                return my_value > other_value
-            else:
-                return my_value < other_value
-        return False
+    def get_sort_key(self):
+        return tuple((-1 if score_field.descending else 1) * getattr(self, score_field.name)
+                     for score_field in config().tournament.score)
