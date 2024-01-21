@@ -1,12 +1,14 @@
 from nicegui import ui
 
 from scoreboard import models
+from scoreboard.config import config
 from scoreboard.gui.utils import Event
 
 tournament_selected = Event('tournament_selected')
 
 
 async def build(unknown_tournament: str = ''):
+    ui.dark_mode(value=config().gui.dark)
     with ui.dialog(value=True).props('persistent'), ui.card():
         if unknown_tournament:
             ui.notify(f"Tournament {unknown_tournament} not found", type='negative')
