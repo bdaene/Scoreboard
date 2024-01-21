@@ -8,7 +8,7 @@ from scoreboard.gui.utils import Events
 
 
 def style():
-    ui.button.default_props('round flat')
+    ui.button.default_props('round flat dense')
     ui.input.default_props('dense')
     ui.tabs.default_props('dense')
 

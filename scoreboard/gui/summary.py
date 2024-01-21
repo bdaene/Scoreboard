@@ -13,7 +13,7 @@ async def build(current_tournament: models.Tournament, events: Events):
 
     async for round in current_tournament.rounds.all():
         round_id = f'round_{round.number}'
-        columns.append(dict(name='round_id', label=f'Round {round.number}', field=round_id) | active_rule)
+        columns.append(dict(name='round_id', label=f'#{round.number}', field=round_id) | active_rule)
         async for score in round.scores.all():
             players_scores.setdefault(await score.player.get(), {})[round_id] = score
 
