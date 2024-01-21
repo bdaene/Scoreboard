@@ -35,13 +35,13 @@ async def run():
     assert (await Seat.get(player=players[5])).number == 2
 
     scores = await asyncio.gather(
-        Score.create(round=round_1, player=players[0], tournament_points=3, victory_points=10),
-        Score.create(round=round_1, player=players[1], tournament_points=0, victory_points=7),
-        Score.create(round=round_1, player=players[2], tournament_points=5, victory_points=13),
-        Score.create(round=round_1, player=players[3], tournament_points=1, victory_points=8),
-        Score.create(round=round_1, player=players[4], tournament_points=3, victory_points=10),
-        Score.create(round=round_1, player=players[5], tournament_points=1, victory_points=6),
-        Score.create(round=round_1, player=players[6], tournament_points=5, victory_points=14),
+        Score.create(round=round_1, player=players[0], tournament_points=3, malus_points=10),
+        Score.create(round=round_1, player=players[1], tournament_points=0, malus_points=7),
+        Score.create(round=round_1, player=players[2], tournament_points=5, malus_points=13),
+        Score.create(round=round_1, player=players[3], tournament_points=1, malus_points=8),
+        Score.create(round=round_1, player=players[4], tournament_points=3, malus_points=10),
+        Score.create(round=round_1, player=players[5], tournament_points=1, malus_points=6),
+        Score.create(round=round_1, player=players[6], tournament_points=5, malus_points=14),
     )
 
     assert await Score.all() == sorted(scores, key=Score.get_sort_key)

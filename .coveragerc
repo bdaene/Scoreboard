@@ -1,2 +1,2 @@
 [run]
-omit = scoreboard/gui/*
+omit = scoreboard/gui/*, scoreboard/main.py

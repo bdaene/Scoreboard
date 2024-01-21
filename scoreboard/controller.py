@@ -1,17 +1,39 @@
 import random
-from itertools import chain, repeat
+from itertools import chain, repeat, permutations
 from typing import Iterable
 
 from scoreboard import models
 from scoreboard.config import config
 
+DEFAULT_SCORE = (0,) * len(config().tournament.score)
+
+
+def get_total(scores):
+    return tuple(map(sum, zip(DEFAULT_SCORE, *scores)))
+
+
+async def _get_players_info(tournament: models.Tournament):
+    player_scores = {}
+    player_seats = {}
+    await tournament.fetch_related('players', 'rounds__scores', 'rounds__tables__seats')
+    for round in tournament.rounds:
+        for score in round.scores:
+            player_scores.setdefault(await score.player.get(), []).append(score.get_sort_key())
+        for table in round.tables:
+            for seat in table.seats:
+                player_seats.setdefault(await seat.player.get(), set()).add(seat.number)
+
+    players = set(tournament.players)
+    players_total_score = {player: get_total(player_scores.get(player, [])) for player in players}
+    players_previous_seats = {player: player_seats.get(player, set()) for player in players}
+
+    return players, players_total_score, players_previous_seats
+
 
 async def create_round(tournament: models.Tournament) -> models.Round:
     number = 1 + await tournament.rounds.all().count()
     round = await models.Round.create(tournament=tournament, number=number)
-    players = await tournament.players.all()
-    # TODO sort players
-    await create_tables(players, round)
+    await create_tables(round)
     return round
 
 
@@ -25,17 +47,25 @@ def get_tables_sizes(players: int, max_table_size: int) -> Iterable[int]:
         max_table_size -= 1
 
 
-async def create_tables(players: list[models.Player], round: models.Round):
+async def create_tables(round: models.Round):
+    players, players_total_score, players_previous_seats = await _get_players_info(round.tournament)
+    players = sorted(players, key=players_total_score.get)
+
     offset = 0
     tables_sizes = get_tables_sizes(len(players), config().tournament.table_size)
     for table_number, table_size in enumerate(tables_sizes, 1):
         table = await models.Table.create(round=round, number=table_number)
-        await create_seats(players[offset:offset + table_size], table)
+        await create_seats(players[offset:offset + table_size], table, players_previous_seats)
         offset += table_size
 
 
-async def create_seats(players: list[models.Player], table: models.Table):
+async def create_seats(players: list[models.Player], table: models.Table, players_previous_seats):
     random.shuffle(players)
-    # TODO check previous seats
+
+    for players_ in permutations(players):
+        if all(s not in players_previous_seats[p] for s, p in enumerate(players_, 1)):
+            players = players_
+            break
+
     for seat_number, player in enumerate(players, 1):
         await models.Seat.create(table=table, number=seat_number, player=player)

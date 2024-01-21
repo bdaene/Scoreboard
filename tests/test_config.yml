@@ -1,10 +1,11 @@
 database:
   url: "sqlite://:memory:"
 tournament:
+  table_size: 3
   score:
     - name: 'tournament_points'
       descending: True
       label : 'TP'
-    - name: 'victory_points'
+    - name: 'malus_points'
       descending: False
-      label : 'VP'
+      label : 'MP'
