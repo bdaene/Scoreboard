@@ -13,7 +13,7 @@ You can:
 
 Using `pysintaller`:
 ```
-python -m pyinstaller scoreboard.spec 
+pyinstaller scoreboard.spec 
 ```
 The executable should be in `dist/scoreboard.exe`
 

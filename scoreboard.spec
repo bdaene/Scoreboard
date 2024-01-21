@@ -8,7 +8,10 @@ a = Analysis(
     ['scoreboard\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[(f'{Path(nicegui.__file__).parent}', 'nicegui')],
+    datas=[
+        (f'{Path(nicegui.__file__).parent}', 'nicegui'),
+        ('scoreboard/emoji_events.ico', 'scoreboard')
+    ],
     hiddenimports=['tortoise.backends.sqlite'],
     hookspath=[],
     hooksconfig={},
