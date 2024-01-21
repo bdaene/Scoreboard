@@ -9,6 +9,8 @@ def main():
 
     if config.DEFAULT_PATH.exists():
         config.load()
+    else:
+        config.save()
 
     try:
         from scoreboard import database, gui  # Config must be loaded before the module models.Score

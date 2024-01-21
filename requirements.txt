@@ -1,5 +1,6 @@
 attrs
 nicegui
+pywebview
 pytest
 pytest-cov
 pyyaml

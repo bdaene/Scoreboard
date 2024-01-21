@@ -8,6 +8,7 @@ setup(
         'attrs',
         'nicegui',
         'pyyaml',
+        'pywebview',
         'tortoise-orm',
     ],
 )
