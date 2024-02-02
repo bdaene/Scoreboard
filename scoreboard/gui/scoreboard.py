@@ -1,68 +1,67 @@
-from attrs import asdict
-from nicegui import ui
+import logging
+from functools import partial
+
+from nicegui import ui, Client
 
 from scoreboard import models
 from scoreboard.config import config
-from scoreboard.gui import players, rounds, summary, tournament
-from scoreboard.gui.utils import Events
+from scoreboard.gui.event import TournamentEvents
+from scoreboard.gui.players import PlayersFrame
+from scoreboard.gui.rounds import RoundsFrame
+from scoreboard.gui.summary import SummaryFrame
+
+_LOGGER = logging.getLogger(__name__)
+
+tournaments_events: dict[models.Tournament, TournamentEvents] = {}
 
 
-def style():
-    ui.button.default_props('round flat dense')
-    ui.input.default_props('dense')
-    ui.tabs.default_props('dense')
+class ScoreBoardHeader:
+    def __init__(self, tournament: models.Tournament):
+        self.tournament = tournament
+        self.dark_mode = ui.dark_mode(value=config().gui.dark)
 
+        self._build()
 
-def build():
-    style()
-
-    @ui.page('/')
-    def index_page():
-        ui.open('/tournaments')
-
-    ui.page('/tournaments')(tournament.build)
-
-    @ui.page('/tournaments/{tournament_name}')
-    async def page(tournament_name: str):
-        current_tournament = await models.Tournament.get_or_none(name=tournament_name)
-        if current_tournament is None:
-            ui.open(f'/tournaments?unknown_tournament={tournament_name}')
-            return
-
-        events = Events()
-        ui.page_title(f'Score Board - {current_tournament.name}')
-        dark_mode = ui.dark_mode(value=config().gui.dark)
-        with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as players_panel:
-            await players.build(current_tournament, events)
-
+    def _build(self):
         with ui.header():
-            ui.button(icon='person', on_click=players_panel.toggle, color='white').classes(remove='bg-white')
-            ui.button(icon='emoji_events', on_click=index_page, color='white').classes(remove='bg-white')
-            ui.label().bind_text_from(current_tournament, 'name').classes('font-bold ml-auto self-center text-2xl')
-            with ui.row(wrap=False).classes('ml-auto'):
-                dark_button = ui.button(icon='dark_mode', color='white').classes(remove='bg-white')
-                light_button = ui.button(icon='light_mode', color='white').classes(remove='bg-white')
-                if dark_mode.value:
-                    dark_button.visible = False
-                else:
-                    light_button.visible = False
+            self.player_button = ui.button(icon='person', color='white').classes(remove='bg-white')
+            self.tournaments_button = ui.button(icon='emoji_events', color='white').classes(remove='bg-white')
+            self.title_label = ui.label(text=self.tournament.name).classes('font-bold ml-auto self-center text-2xl')
+            self.dark_mode_button = ui.button(icon='dark_mode', color='white').classes('ml-auto', remove='bg-white')
 
-        async def toggle_dark_mode():
-            dark_mode.toggle()
-            config().gui.dark = dark_mode.value
-            dark_button.visible = not dark_button.visible
-            light_button.visible = not light_button.visible
+        self.update_dark_mode()
 
-        dark_button.on('click', toggle_dark_mode)
-        light_button.on('click', toggle_dark_mode)
+        self.tournaments_button.on('click', partial(ui.open, '/tournaments'))
+        self.dark_mode_button.on('click', partial(self.update_dark_mode, toggle=True))
 
+    def update_dark_mode(self, toggle=False):
+        if toggle:
+            self.dark_mode.toggle()
+        self.dark_mode_button.props(f"icon={'light_mode' if self.dark_mode.value else 'dark_mode'}")
+
+
+class ScoreBoardFrame:
+    def __init__(self, client: Client, tournament: models.Tournament):
+        self.client = client
+        self.tournament = tournament
+        self.events = tournaments_events.setdefault(tournament, TournamentEvents())
+
+        self.events.add_client(self.client)
+        self.client.on_disconnect(partial(self.events.remove_client, self.client))
+        self.client.notify = lambda message: self.client.outbox.enqueue_message('notify', dict(message=message),
+                                                                                self.client.id)
+
+        self._build()
+
+        self.header.player_button.on('click', self.players_panel.toggle)
+        self.players.menu_button.on('click', self.players_panel.toggle)
+
+    def _build(self):
+        _LOGGER.debug(f"Building {self} for client {self.client}.")
+        ui.page_title(f'Score Board - {self.tournament.name}')
+        self.header = ScoreBoardHeader(self.tournament)
+        with ui.left_drawer(value=True, elevated=True, bottom_corner=True) as self.players_panel:
+            self.players = PlayersFrame(self.client, self.events, self.tournament)
         with ui.row(wrap=False).classes('w-full h-full'):
-            await rounds.build(current_tournament, events)
-            await summary.build(current_tournament, events)
-
-
-def start():
-    style()
-    build()
-
-    ui.run(reload=False, **asdict(config().gui))
+            self.rounds = RoundsFrame(self.client, self.events, self.tournament)
+            self.summary = SummaryFrame(self.client, self.events, self.tournament)

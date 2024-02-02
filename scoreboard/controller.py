@@ -15,13 +15,13 @@ def get_total(scores):
 async def _get_players_info(tournament: models.Tournament):
     player_scores = {}
     player_seats = {}
-    await tournament.fetch_related('players', 'rounds__scores', 'rounds__tables__seats')
+    await tournament.fetch_related('players', 'rounds__scores__player', 'rounds__tables__seats__player')
     for round in tournament.rounds:
         for score in round.scores:
-            player_scores.setdefault(await score.player.get(), []).append(score.get_sort_key())
+            player_scores.setdefault(score.player, []).append(score.get_sort_key())
         for table in round.tables:
             for seat in table.seats:
-                player_seats.setdefault(await seat.player.get(), set()).add(seat.number)
+                player_seats.setdefault(seat.player, set()).add(seat.number)
 
     players = set(tournament.players)
     players_total_score = {player: get_total(player_scores.get(player, [])) for player in players}

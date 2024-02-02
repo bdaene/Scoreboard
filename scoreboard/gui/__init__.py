@@ -1,1 +1,1 @@
-from scoreboard.gui.scoreboard import start
+from scoreboard.gui.main import start

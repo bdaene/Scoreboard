@@ -12,8 +12,8 @@ def main():
     else:
         config.save()
 
+    from scoreboard import database, gui  # Config must be loaded before the module models.Score
     try:
-        from scoreboard import database, gui  # Config must be loaded before the module models.Score
         asyncio.run(database.init())
         gui.start()
     finally:
